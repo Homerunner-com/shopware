@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="HomeRunnerPlugin\Subscriber\SystemConfigSubscriber">
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
+            <argument type="service" id="HomeRunnerPlugin\Service\PrintService" />
+            <argument type="service" id="HomeRunnerPlugin\Service\MethodsService" />
+            <argument type="service" id="HomeRunnerPlugin\Service\WarehouseService" />
+            <argument type="service" id="HomeRunnerPlugin\Service\CustomFieldService" />
+            <argument type="service" id="logger"/>
+            <tag name="kernel.event_subscriber" />
+        </service>
+
+        <service id="HomeRunnerPlugin\Subscriber\CartSubscriber">
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
+            <argument type="service" id="logger"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="HomeRunnerPlugin\Subscriber\ShippingSubscriber">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="HomeRunnerPlugin\Subscriber\OrderStateSubscriber">
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
+            <argument type="service" id="logger" />
+            <argument type="service" id="HomeRunnerPlugin\Service\OrderService" />
+            <argument type="service" id="HomeRunnerPlugin\Service\DeliveryService" />
+            <argument type="service" id="HomeRunnerPlugin\Service\PrintService" />
+            <argument type="service" id="HomeRunnerPlugin\Service\WarehouseService" />
+            <argument type="service" id="HomeRunnerPlugin\Service\MethodsService" />
+            <argument type="service" id="HomeRunnerPlugin\Service\CurrencyService" />
+            <argument type="service" id="country.repository"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="HomeRunnerPlugin\Service\OrderService">
+            <argument type="service" id="order.repository"/>
+        </service>
+
+        <service id="HomeRunnerPlugin\Service\PrintService">
+            <argument type="service" id="homerunner_printers.repository"/>
+        </service>
+
+        <service id="HomeRunnerPlugin\Service\MethodsService">
+            <argument type="service" id="homerunner_methods.repository"/>
+        </service>
+
+        <service id="HomeRunnerPlugin\Service\DeliveryService">
+            <argument type="service" id="order_delivery.repository" />
+        </service>
+
+        <service id="HomeRunnerPlugin\Service\WarehouseService">
+            <argument type="service" id="homerunner_warehouses.repository" />
+        </service>
+
+        <service id="HomeRunnerPlugin\Service\CustomFieldService">
+            <argument type="service" id="custom_field_set.repository" />
+        </service>
+
+        <service id="HomeRunnerPlugin\Service\CurrencyService">
+            <argument type="service" id="currency.repository" />
+        </service>
+
+        <service id="HomeRunnerPlugin\Core\Content\PrintService\PrintServiceDefinition">
+            <tag name="shopware.entity.definition" entity="homerunner_printers" />
+        </service>
+
+        <service id="HomeRunnerPlugin\Core\Content\Methods\MethodsDefinition">
+            <tag name="shopware.entity.definition" entity="homerunner_methods" />
+        </service>
+
+        <service id="HomeRunnerPlugin\Core\Content\Warehouses\WarehouseDefinition">
+            <tag name="shopware.entity.definition" entity="homerunner_warehouses" />
+        </service>
+
+
+    </services>
+
+</container>
