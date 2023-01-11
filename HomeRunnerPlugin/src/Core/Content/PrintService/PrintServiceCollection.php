@@ -1,6 +1,6 @@
 <?php
 
-namespace CoolRunnerPlugin\Core\Content\PrintService;
+namespace HomeRunnerPlugin\Core\Content\PrintService;
 
 use Shopware\Core\Framework\DataAbstractionLayer\EntityCollection;
 

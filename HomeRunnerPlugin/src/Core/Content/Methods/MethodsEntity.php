@@ -1,6 +1,6 @@
 <?php
 
-namespace CoolRunnerPlugin\Core\Content\Methods;
+namespace HomeRunnerPlugin\Core\Content\Methods;
 
 use Shopware\Core\Framework\DataAbstractionLayer\Entity;
 use Shopware\Core\Framework\DataAbstractionLayer\EntityIdTrait;
