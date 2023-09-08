@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="CoolRunnerPlugin\Subscriber\SystemConfigSubscriber">
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
+            <argument type="service" id="CoolRunnerPlugin\Helper\InstallHelper" />
+            <argument type="service" id="logger"/>
+            <tag name="kernel.event_subscriber" />
+        </service>
+
+        <service id="CoolRunnerPlugin\Subscriber\OrderStateSubscriber">
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService" />
+            <argument type="service" id="logger" />
+            <argument type="service" id="CoolRunnerPlugin\Service\OrderService" />
+            <argument type="service" id="CoolRunnerPlugin\Service\DeliveryService" />
+            <argument type="service" id="CoolRunnerPlugin\Service\PrintService" />
+            <argument type="service" id="CoolRunnerPlugin\Service\WarehouseService" />
+            <argument type="service" id="CoolRunnerPlugin\Service\MethodsService" />
+            <argument type="service" id="CoolRunnerPlugin\Service\CurrencyService" />
+            <argument type="service" id="country.repository"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="CoolRunnerPlugin\Service\OrderService">
+            <argument type="service" id="order.repository"/>
+        </service>
+
+        <service id="CoolRunnerPlugin\Service\PrintService">
+            <argument type="service" id="coolrunner_printers.repository"/>
+        </service>
+
+        <service id="CoolRunnerPlugin\Service\MethodsService">
+            <argument type="service" id="coolrunner_methods.repository"/>
+        </service>
+
+        <service id="CoolRunnerPlugin\Service\DeliveryService">
+            <argument type="service" id="order_delivery.repository" />
+        </service>
+
+        <service id="CoolRunnerPlugin\Service\WarehouseService">
+            <argument type="service" id="coolrunner_warehouses.repository" />
+        </service>
+
+        <service id="CoolRunnerPlugin\Helper\InstallHelper" public="true">
+            <argument type="service" id="coolrunner_warehouses.repository" />
+            <argument type="service" id="coolrunner_methods.repository"/>
+            <argument type="service" id="coolrunner_printers.repository"/>
+        </service>
+
+        <service id="CoolRunnerPlugin\Service\CurrencyService">
+            <argument type="service" id="currency.repository" />
+        </service>
+
+        <service id="CoolRunnerPlugin\Core\Content\PrintService\PrintServiceDefinition">
+            <tag name="shopware.entity.definition" entity="coolrunner_printers" />
+        </service>
+
+        <service id="CoolRunnerPlugin\Core\Content\Methods\MethodsDefinition">
+            <tag name="shopware.entity.definition" entity="coolrunner_methods" />
+        </service>
+
+        <service id="CoolRunnerPlugin\Core\Content\Warehouses\WarehouseDefinition">
+            <tag name="shopware.entity.definition" entity="coolrunner_warehouses" />
+        </service>
+
+
+    </services>
+
+</container>

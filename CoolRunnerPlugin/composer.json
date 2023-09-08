@@ -1,0 +1,32 @@
+{
+  "name": "coolrunner/plugin",
+  "description": "Homerunner",
+  "version": "1.0.0",
+  "type": "shopware-platform-plugin",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Kevin Steen Hansen",
+      "role": "Integration Specialist"
+    }
+  ],
+  "require": {
+    "shopware/core": "*"
+  },
+  "extra": {
+    "shopware-plugin-class": "CoolRunnerPlugin\\CoolRunnerPlugin",
+    "label": {
+      "de-DE": "Homerunner",
+      "en-GB": "Homerunner"
+    },
+    "description": {
+      "de-DE": "We help you to easily handle shipping world wide.",
+      "en-GB": "We help you to easily handle shipping world wide."
+    }
+  },
+  "autoload": {
+    "psr-4": {
+      "CoolRunnerPlugin\\": "src/"
+    }
+  }
+}

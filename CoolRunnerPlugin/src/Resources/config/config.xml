@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/platform/trunk/src/Core/System/SystemConfig/Schema/config.xsd">
+
+    <card>
+        <title>Configuration</title>
+        <input-field type="bool">
+            <name>active</name>
+            <label>Active</label>
+        </input-field>
+    </card>
+
+    <card>
+        <title>Integration</title>
+        <input-field type="text">
+            <name>smartcheckouttoken</name>
+            <label>Installation Key</label>
+            <placeholder>000-000-000</placeholder>
+        </input-field>
+
+        <input-field type="text">
+            <name>apiemail</name>
+            <label>API Email</label>
+            <disabled>true</disabled>
+        </input-field>
+
+        <input-field type="text">
+            <name>apitoken</name>
+            <label>API Token</label>
+            <disabled>true</disabled>
+        </input-field>
+
+        <input-field type="text">
+            <name>shoptoken</name>
+            <label>Shop Token</label>
+            <disabled>true</disabled>
+        </input-field>
+    </card>
+
+    <card>
+        <title>Warehouse / Print Settings</title>
+        <input-field type="single-select">
+            <name>warehouse</name>
+            <label>Warehouse</label>
+            <options>
+                <option>
+                    <id>internal</id>
+                    <name>Inhouse warehouse</name>
+                </option>
+                <option>
+                    <id>external</id>
+                    <name>External warehouse</name>
+                </option>
+            </options>
+        </input-field>
+
+        <input-field type="single-select">
+            <name>printformat</name>
+            <label>Print format</label>
+            <options>
+                <option>
+                    <id>LabelPrint</id>
+                    <name>LabelPrint</name>
+                </option>
+                <option>
+                    <id>A4</id>
+                    <name>A4</name>
+                </option>
+            </options>
+        </input-field>
+    </card>
+
+    <card>
+        <title>Inhouse Settings</title>
+        <input-field type="bool">
+            <name>autoprint</name>
+            <label>Auto print label on creation (Print Service)</label>
+        </input-field>
+
+        <component name="sw-entity-single-select">
+            <name>printer</name>
+            <entity>coolrunner_printers</entity>
+            <label>Choose printer</label>
+        </component>
+    </card>
+
+    <card>
+        <title>External Settings</title>
+        <component name="sw-entity-single-select">
+            <name>externalwarehouse</name>
+            <entity>coolrunner_warehouses</entity>
+            <label>Choose which warehouse</label>
+        </component>
+    </card>
+
+    <card>
+        <title>Sender</title>
+        <input-field type="text">
+            <name>sendershop</name>
+            <label>Shop</label>
+        </input-field>
+
+        <input-field type="text">
+            <name>sendershopurl</name>
+            <label>Shop Url</label>
+        </input-field>
+
+        <input-field type="text">
+            <name>senderstreet1</name>
+            <label>Street 1</label>
+        </input-field>
+
+        <input-field type="text">
+            <name>senderstreet2</name>
+            <label>Street 2</label>
+        </input-field>
+
+        <input-field type="text">
+            <name>senderzipcode</name>
+            <label>Zipcode</label>
+        </input-field>
+
+        <input-field type="text">
+            <name>sendercity</name>
+            <label>City</label>
+        </input-field>
+
+        <input-field type="text">
+            <name>sendercountry</name>
+            <label>Country (ISO2)</label>
+        </input-field>
+
+        <input-field type="text">
+            <name>senderphone</name>
+            <label>Phone</label>
+        </input-field>
+
+        <input-field type="text">
+            <name>senderemail</name>
+            <label>Email</label>
+        </input-field>
+    </card>
+
+</config>
