@@ -142,6 +142,7 @@ class CoolRunnerAPI
                     'currency_code' => $currency->isoCode,
                     'sender_tariff' => $orderLine->getPayload()['customFields']['coolrunner_customs_hscode_from'] ?? "",
                     'receiver_tariff' =>  $orderLine->getPayload()['customFields']['coolrunner_customs_hscode_to'] ?? "",
+                    'origin_country' =>  $orderLine->getPayload()['customFields']['coolrunner_customs_origin_country'] ?? "",
                     'weight' => ($product->getWeight()*1000)*$orderLine->quantity
                 ]
             ];
