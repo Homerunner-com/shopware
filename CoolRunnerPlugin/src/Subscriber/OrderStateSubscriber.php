@@ -85,7 +85,6 @@ class OrderStateSubscriber implements EventSubscriberInterface
 
     public function onDeliveryStateChange(StateMachineStateChangeEvent $event)
     {
-        $this->logger->debug('HOMERUNNER: Order state changed ' . $event->getStateEventName());
         if($event->getStateEventName() == 'state_enter.order_delivery.state.shipped') {
             /** @var OrderEntity $order */
             $tempOrder = $this->deliveryService->getDeliveryById(
@@ -96,54 +95,55 @@ class OrderStateSubscriber implements EventSubscriberInterface
             /** @var OrderEntity $order */
             $order = $this->orderService->readData($event->getContext(), $tempOrder->getId());
 
-            // Get country
-            $country_criteria = new Criteria();
-            $country_criteria->addFilter(new EqualsFilter('id', $order->addresses->first()->countryId));
-            $country = $this->countryRepository->search($country_criteria, $event->getContext())->first();
+            if(isset($order->getDeliveries()->first()->getShippingMethod()->getCustomFields()['coolrunner_methods'])) {
 
-            // Get shipping method
-            $shipping_method = $this->methodsService->getMethodById(
-                $event->getContext(),
-                $order->getDeliveries()->first()->getShippingMethod()->getCustomFields()['coolrunner_methods']
-            );
+                // Get country
+                $country_criteria = new Criteria();
+                $country_criteria->addFilter(new EqualsFilter('id', $order->addresses->first()->countryId));
+                $country = $this->countryRepository->search($country_criteria, $event->getContext())->first();
 
-            // Get Currency
-            $currency = $this->currencyService->getCurrencyById($event->getContext(), $order->getCurrencyId());
-
-            // Create shipment
-            if($this->systemConfigService->get('CoolRunnerPlugin.config.warehouse') == 'internal') {
-                $this->logger->debug('Creating shipment');
-                $response = $this->apiClient->createShipment($order, $country, $shipping_method, $currency);
-            } else {
-                $warehouse = $this->warehouseService->getWarehouseById(
+                // Get shipping method
+                $shipping_method = $this->methodsService->getMethodById(
                     $event->getContext(),
-                    $this->systemConfigService->get('CoolRunnerPlugin.config.externalwarehouse')
+                    $order->getDeliveries()->first()->getShippingMethod()->getCustomFields()['coolrunner_methods']
                 );
 
-                $response = $this->apiClient->createShipment($order, $country, $shipping_method, $currency, $warehouse->getShorten());
-            }
+                // Get Currency
+                $currency = $this->currencyService->getCurrencyById($event->getContext(), $order->getCurrencyId());
 
-            if(isset($response['body']->package_number) AND $response['body']->package_number != "") {
-                // Handle V3
-                $this->deliveryService->writeData($event->getContext(), $response['delivery_id'], $response['body']->package_number);
-
-                if($this->systemConfigService->get('CoolRunnerPlugin.config.autoprint') AND $this->systemConfigService->get('CoolRunnerPlugin.config.warehouse') == "internal") {
-                    $printer = $this->printService->getPrinterById(
+                // Create shipment
+                if ($this->systemConfigService->get('CoolRunnerPlugin.config.warehouse') == 'internal') {
+                    $response = $this->apiClient->createShipment($order, $country, $shipping_method, $currency);
+                } else {
+                    $warehouse = $this->warehouseService->getWarehouseById(
                         $event->getContext(),
-                        $this->systemConfigService->get('CoolRunnerPlugin.config.printer')
+                        $this->systemConfigService->get('CoolRunnerPlugin.config.externalwarehouse')
                     );
 
-                    $this->apiClient->printLabel($response['body']->package_number, $printer->getName());
+                    $response = $this->apiClient->createShipment($order, $country, $shipping_method, $currency, $warehouse->getShorten());
                 }
-            } elseif (isset($response['body']->shipments[0]->package_number) AND $response['body']->shipments[0]->package_number != "") {
-                // Handle WMS
-                $this->deliveryService->writeData(
-                    $event->getContext(),
-                    $response['delivery_id'],
-                    $response['body']->shipments[0]->package_number
-                );
-            }
 
+                if (isset($response['body']->package_number) and $response['body']->package_number != "") {
+                    // Handle V3
+                    $this->deliveryService->writeData($event->getContext(), $response['delivery_id'], $response['body']->package_number);
+
+                    if ($this->systemConfigService->get('CoolRunnerPlugin.config.autoprint') and $this->systemConfigService->get('CoolRunnerPlugin.config.warehouse') == "internal") {
+                        $printer = $this->printService->getPrinterById(
+                            $event->getContext(),
+                            $this->systemConfigService->get('CoolRunnerPlugin.config.printer')
+                        );
+
+                        $this->apiClient->printLabel($response['body']->package_number, $printer->getName());
+                    }
+                } elseif (isset($response['body']->shipments[0]->package_number) and $response['body']->shipments[0]->package_number != "") {
+                    // Handle WMS
+                    $this->deliveryService->writeData(
+                        $event->getContext(),
+                        $response['delivery_id'],
+                        $response['body']->shipments[0]->package_number
+                    );
+                }
+            }
         }
     }
 }
