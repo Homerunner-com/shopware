@@ -8,6 +8,9 @@ use Psr\Log\LoggerInterface;
 use Shopware\Core\Checkout\Order\Aggregate\OrderAddress\OrderAddressCollection;
 use Shopware\Core\Checkout\Order\OrderEntity;
 use Shopware\Core\Content\Product\ProductEntity;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Criteria;
+use Shopware\Core\Framework\DataAbstractionLayer\Search\Filter\EqualsFilter;
+use Shopware\Core\System\Country\CountryEntity;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 
 class CoolRunnerAPI
@@ -59,22 +62,22 @@ class CoolRunnerAPI
         return json_decode($response->getBody()->getContents());
     }
 
-    public function createShipment($order, $country, $shipping_method, $currency, $warehouse = '')
+    public function createShipment($order, $country, $shipping_method, $currency, $country_respository, $context, $warehouse = '')
     {
-         switch ($this->systemConfigService->get('CoolRunnerPlugin.config.warehouse')) {
-             case 'internal':
-                 return $this->createV3($order, $shipping_method, $currency, $country);
-                 break;
-             case 'external':
-                 return $this->createWMS($order, $warehouse, $shipping_method, $currency, $country);
-                 break;
+        switch ($this->systemConfigService->get('CoolRunnerPlugin.config.warehouse')) {
+            case 'internal':
+                return $this->createV3($order, $shipping_method, $currency, $country_respository, $context, $country);
+                break;
+            case 'external':
+                return $this->createWMS($order, $warehouse, $shipping_method, $country_respository, $context, $currency, $country);
+                break;
             default:
                 return false;
                 break;
         };
     }
 
-    private function createV3(OrderEntity $order, $shipping_method, $currency, $country = null)
+    private function createV3(OrderEntity $order, $shipping_method, $currency, $country_respository, $context, $country = null)
     {
         $customerAddress = $order->getAddresses()->first();
         $customerInformation = $order->getOrderCustomer();
@@ -133,6 +136,11 @@ class CoolRunnerAPI
             /**@var ProductEntity $product*/
             $product = $orderLine->getProduct();
 
+            // Get country
+            $country_criteria = new Criteria();
+            $country_criteria->addFilter(new EqualsFilter('id', $orderLine->getPayload()['customFields']['coolrunner_customs_origin_country']));
+            $country = $country_respository->search($country_criteria, $context)->first();
+
             $data['order_lines'][] = [
                 'qty' => $orderLine->getQuantity(),
                 'item_number' => $orderLine->payload['productNumber'],
@@ -142,7 +150,7 @@ class CoolRunnerAPI
                     'currency_code' => $currency->isoCode,
                     'sender_tariff' => $orderLine->getPayload()['customFields']['coolrunner_customs_hscode_from'] ?? "",
                     'receiver_tariff' =>  $orderLine->getPayload()['customFields']['coolrunner_customs_hscode_to'] ?? "",
-                    'origin_country' =>  $orderLine->getPayload()['customFields']['coolrunner_customs_origin_country'] ?? "",
+                    'origin_country' =>  $country->iso ?? "",
                     'weight' => ($product->getWeight()*1000)*$orderLine->quantity
                 ]
             ];
@@ -169,7 +177,7 @@ class CoolRunnerAPI
         return ['body' => json_decode($response->getBody()), 'delivery_id' => $delivery->getId()];
     }
 
-    private function createWMS(OrderEntity $order, $warehouse, $shipping_method, $currency, $country = null)
+    private function createWMS(OrderEntity $order, $warehouse, $shipping_method, $country_respository, $context, $currency, $country = null)
     {
         $customerAddress = $order->getAddresses()->first();
         $customerInformation = $order->getOrderCustomer();
@@ -228,18 +236,29 @@ class CoolRunnerAPI
         ];
 
         foreach ($orderLines as $orderLine) {
+            /**@var ProductEntity $product*/
+            $product = $orderLine->getProduct();
+
+            // Get country
+            $country_criteria = new Criteria();
+            $country_criteria->addFilter(new EqualsFilter('id', $orderLine->getPayload()['customFields']['coolrunner_customs_origin_country']));
+            $country = $country_respository->search($country_criteria, $context)->first();
+
             $data['order_lines'][] = [
-                'qty' => $orderLine->quantity,
+                'qty' => $orderLine->getQuantity(),
                 'item_number' => $orderLine->payload['productNumber'],
                 'customs' => [
-                    'description' => $orderLine->label,
-                    'total_price' => $orderLine->totalPrice,
+                    'description' => $orderLine->getLabel(),
+                    'total_price' => $orderLine->getTotalPrice(),
                     'currency_code' => $currency->isoCode,
-                    'sender_tariff' => $orderLine->getPayload()['customFields']['coolrunner_customs_hscode_from'],
-                    'receiver_tariff' =>  $orderLine->getPayload()['customFields']['coolrunner_customs_hscode_to'],
-                    'weight' => ''
+                    'sender_tariff' => $orderLine->getPayload()['customFields']['coolrunner_customs_hscode_from'] ?? "",
+                    'receiver_tariff' =>  $orderLine->getPayload()['customFields']['coolrunner_customs_hscode_to'] ?? "",
+                    'origin_country' =>  $country->iso ?? "",
+                    'weight' => ($product->getWeight()*1000)*$orderLine->quantity
                 ]
             ];
+
+            $totalWeight += ($product->getWeight()*1000)*$orderLine->quantity;
         }
 
         $request = new Request(

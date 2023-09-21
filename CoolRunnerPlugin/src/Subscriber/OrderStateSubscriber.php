@@ -96,6 +96,7 @@ class OrderStateSubscriber implements EventSubscriberInterface
             $order = $this->orderService->readData($event->getContext(), $tempOrder->getId());
 
             if(isset($order->getDeliveries()->first()->getShippingMethod()->getCustomFields()['coolrunner_methods'])) {
+                $empty = $this->countryRepository;
 
                 // Get country
                 $country_criteria = new Criteria();
@@ -113,14 +114,14 @@ class OrderStateSubscriber implements EventSubscriberInterface
 
                 // Create shipment
                 if ($this->systemConfigService->get('CoolRunnerPlugin.config.warehouse') == 'internal') {
-                    $response = $this->apiClient->createShipment($order, $country, $shipping_method, $currency);
+                    $response = $this->apiClient->createShipment($order, $country, $shipping_method, $currency, $this->countryRepository, $event->getContext());
                 } else {
                     $warehouse = $this->warehouseService->getWarehouseById(
                         $event->getContext(),
                         $this->systemConfigService->get('CoolRunnerPlugin.config.externalwarehouse')
                     );
 
-                    $response = $this->apiClient->createShipment($order, $country, $shipping_method, $currency, $warehouse->getShorten());
+                    $response = $this->apiClient->createShipment($order, $country, $shipping_method, $currency, $this->countryRepository, $event->getContext(), $warehouse->getShorten());
                 }
 
                 if (isset($response['body']->package_number) and $response['body']->package_number != "") {
