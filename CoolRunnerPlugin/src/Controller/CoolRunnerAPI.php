@@ -220,9 +220,9 @@ class CoolRunnerAPI
                 'notify_sms' => $customerAddress->getPhoneNumber(),
                 'notify_email' => $customerInformation->getEmail()
             ],
-            'length' => 15,
-            'width' => 15,
-            'height' => 15,
+            'length' => 10,
+            'width' => 10,
+            'height' => 10,
             'weight' => 1000,
             'carrier' => $carrier,
             'carrier_product' => $carrier_product,
