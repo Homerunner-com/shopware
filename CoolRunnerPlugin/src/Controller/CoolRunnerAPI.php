@@ -79,7 +79,7 @@ class CoolRunnerAPI
 
     private function createV3(OrderEntity $order, $shipping_method, $currency, $country_respository, $context, $country = null)
     {
-        $customerAddress = $order->getAddresses()->first();
+        $customerAddress = $order->getDeliveries()->first()->getShippingOrderAddress();
         $customerInformation = $order->getOrderCustomer();
         $orderLines = $order->getLineItems();
 
