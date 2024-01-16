@@ -85,7 +85,7 @@ class SystemConfigSubscriber implements EventSubscriberInterface
             $this->getPrinters($context);
         }
 
-        if(isset($this->systemConfigService->get('CoolRunnerPlugin.config.apitoken'))) {
+        if($this->systemConfigService->get('CoolRunnerPlugin.config.apitoken') !== null) {
             $this->getShippingMethods($context);
         }
 
