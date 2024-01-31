@@ -86,6 +86,9 @@ class SystemConfigSubscriber implements EventSubscriberInterface
         }
 
         if($this->systemConfigService->get('CoolRunnerPlugin.config.apitoken') !== null) {
+            // Needed because of no context on this event
+            $context = Context::createDefaultContext();
+            
             $this->getShippingMethods($context);
         }
 
